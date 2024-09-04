@@ -9,9 +9,13 @@ if (!uri) {
 const client = new MongoClient(uri);
 
 export const connectToDatabase = async () => {
-  await client.connect();
-  console.log("connected to MongoDB");
-  return client.db();
+  try {
+    await client.connect();
+    console.log("connected to MongoDB");
+    return client.db();
+  } catch (err) {
+    console.error(`Error connecting to database: ${err}`);
+  }
 };
 
 export const closeDatabaseConnection = async () => {
