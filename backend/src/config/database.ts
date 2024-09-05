@@ -1,6 +1,13 @@
 import { MongoClient } from "mongodb";
 import { config } from "dotenv";
-config();
+import { dirname, resolve } from "path";
+import { fileURLToPath } from "url";
+
+// Emulate __dirname in TypeScript (ES Modules)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+config({ path: resolve(__dirname, "../../../.env") });
 
 const uri = process.env.MONGO_URI;
 if (!uri) {
@@ -8,16 +15,12 @@ if (!uri) {
 }
 const client = new MongoClient(uri);
 
-export const connectToDatabase = async () => {
+export const connectToDatabase = async (dbName: string) => {
   try {
     await client.connect();
     console.log("connected to MongoDB");
-    return client.db();
+    return client.db(dbName);
   } catch (err) {
     console.error(`Error connecting to database: ${err}`);
   }
-};
-
-export const closeDatabaseConnection = async () => {
-  await client.close();
 };
