@@ -1,11 +1,8 @@
 import request from "supertest";
-import { closeDatabaseConnection } from "../config/database.ts";
 import { createTestApp } from "../utils/testHelpers.ts";
 
 describe.skip("GET /", () => {
-  afterAll(async () => {
-    await closeDatabaseConnection();
-  });
+
 
   it('should return "Hello, World"', async () => {
     const app = await createTestApp();

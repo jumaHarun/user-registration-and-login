@@ -4,7 +4,7 @@ import { connectToDatabase } from "../config/database.ts";
 export const createTestApp = async () => {
   const app = express();
 
-  await connectToDatabase();
+  await connectToDatabase("userAuth");
 
   app.get("/", (req, res) => {
     res.send("Hello, World!");

@@ -2,7 +2,6 @@ import request from "supertest";
 import { Application } from "express";
 import { createTestApp } from "../utils/testHelpers.ts";
 import User from "../models/User.ts";
-import { closeDatabaseConnection } from "src/config/database.ts";
 
 describe("POST /api/auth/register", () => {
   let app: Application;
@@ -16,10 +15,6 @@ describe("POST /api/auth/register", () => {
     await User.deleteMany({});
   });
 
-  afterAll(async () => {
-    // Close the connection after all tests
-    await closeDatabaseConnection();
-  });
 
   it("should register a new user successfully", async () => {
     const response = await request(app)
