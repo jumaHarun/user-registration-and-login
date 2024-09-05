@@ -5,6 +5,7 @@ import {
   closeDatabaseConnection,
   connectToDatabase,
 } from "./config/database.ts";
+import authRoutes from "./routes/authRoutes.ts";
 
 config();
 
@@ -26,6 +27,7 @@ app.get("/", (req, res) => {
   res.send("Hello, World!");
 });
 
+app.use("/api/auth", authRoutes);
 app.use(errorHandler);
 
 const port = process.env.PORT || 3000;
