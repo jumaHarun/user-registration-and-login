@@ -1,4 +1,4 @@
-import { MongoClient, Db, Collection } from "mongodb";
+import { MongoClient, Db } from "mongodb";
 import { config } from "dotenv";
 
 config({ path: "../.env" });
@@ -20,6 +20,7 @@ export const connectToDB = async () => {
     console.log(`Connected to the ${dbName} database.`);
   } catch (error) {
     console.error(`Error connecting to database:\n${error}`);
+    process.exit(1);
   }
 };
 
@@ -28,4 +29,13 @@ export const getDB = async (): Promise<Db> => {
     await connectToDB();
   }
   return db;
+};
+
+export const closeClient = async () => {
+  try {
+    await client.close();
+  } catch (error) {
+    console.error(`Error closing connection:\n${error}`);
+    process.exit(1);
+  }
 };
