@@ -4,24 +4,25 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon --exec tsx src/index.ts",
-    "test": "jest",
-    "start": "tsx src/index.ts",
-    "build": "tsc"
+    "dev": "cross-env NODE_ENV=development nodemon --exec ts-node ./src/index.ts --files",
+    "start": "cross-env NODE_ENV=production node ./dist/src/index.js",
+    "build": "tsc",
+    "test": "jest --coverage=true -w=1 --forceExit --detectOpenHandles --watchAll=false --testPathPattern=src/__tests__"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "description": "",
   "devDependencies": {
+    "@tsconfig/node20": "^20.1.4",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.12",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/mongodb": "^4.0.7",
-    "@types/mongoose": "^5.11.97",
     "@types/node": "^22.5.3",
     "@types/supertest": "^6.0.2",
+    "cross-env": "^7.0.3",
     "jest": "^29.7.0",
     "nodemon": "^3.1.4",
     "supertest": "^7.0.0",
@@ -35,7 +36,6 @@
     "express": "^4.19.2",
     "express-async-handler": "^1.2.0",
     "jsonwebtoken": "^9.0.2",
-    "mongodb": "^6.8.0",
-    "mongoose": "^8.6.1"
+    "mongodb": "^6.8.0"
   }
 }
