@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcrypt";
-import User from "../models/User.ts";
+import { getDB } from "../config/database.ts";
+import { createUser } from "../repos/userRepo.ts";
 
 const saltOrRounds = 10;
 
@@ -17,7 +18,8 @@ export const registerUser = asyncHandler(
       return;
     }
 
-    const existingUser = await User.findOne({ email: email });
+    const userColl = (await getDB()).collection("users");
+    const existingUser = await userColl.findOne({ email });
     if (existingUser) {
       res.status(400).json({ message: "Email already registered" });
       return;
@@ -25,9 +27,10 @@ export const registerUser = asyncHandler(
 
     const hashedPassword = await bcrypt.hash(password, saltOrRounds);
 
-    const newUser = new User({ email, password: hashedPassword });
-    await newUser.save();
+    const newUser = await createUser(email, hashedPassword);
 
-    res.status(201).json({ message: "User registered successfully" });
+    res.status(201).json({
+      message: `User registered successfully with _id ${newUser._id}`,
+    });
   }
 );

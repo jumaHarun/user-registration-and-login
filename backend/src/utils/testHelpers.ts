@@ -1,10 +1,10 @@
 import express from "express";
-import { connectToDatabase } from "../config/database.ts";
+import { connectToDB } from "../config/database.ts";
 
 export const createTestApp = async () => {
   const app = express();
 
-  await connectToDatabase("userAuth");
+  await connectToDB();
 
   app.get("/", (req, res) => {
     res.send("Hello, World!");
