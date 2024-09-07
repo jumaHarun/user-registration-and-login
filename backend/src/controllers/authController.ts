@@ -18,8 +18,8 @@ export const registerUser = asyncHandler(
       return;
     }
 
-    const userColl = (await getDB()).collection("users");
-    const existingUser = await userColl.findOne({ email });
+    const db = await getDB();
+    const existingUser = await db.collection("users").findOne({ email });
     if (existingUser) {
       res.status(400).json({ message: "Email already registered" });
       return;
@@ -30,7 +30,8 @@ export const registerUser = asyncHandler(
     const newUser = await createUser(email, hashedPassword);
 
     res.status(201).json({
-      message: `User registered successfully with _id ${newUser._id}`,
+      message: `User registered successfully`,
+      user: newUser,
     });
   }
 );
