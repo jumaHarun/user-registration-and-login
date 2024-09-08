@@ -1,5 +1,7 @@
-import { MongoClient, Db } from "mongodb";
+import { ObjectId, MongoClient, Db } from "mongodb";
 import { config } from "dotenv";
+import mockUsers from "./mock_users.json";
+import { isUserPassword, hashPassword } from "../utils/databaseHelpers.ts";
 
 config({ path: "../.env" });
 
@@ -39,3 +41,71 @@ export const closeClient = async () => {
     process.exit(1);
   }
 };
+
+interface User {
+  _id?: ObjectId;
+  email: string;
+  password: string;
+}
+
+export const addMockUsers = async () => {
+  try {
+    if (db == undefined) {
+      await connectToDB();
+    }
+
+    const usersWithHashedPassword: User[] = [];
+    for await (const { email, password } of mockUsers) {
+      const hashedPassword = await hashPassword(password, 10);
+
+      usersWithHashedPassword.push({ email, password: hashedPassword });
+    }
+
+    const result = await db
+      .collection("users")
+      .insertMany(usersWithHashedPassword);
+
+    console.log(`Added ${result.insertedCount} users successfully.`);
+  } catch (err) {
+    console.error(`Error adding mock users:\n${err}`);
+    process.exit(1);
+  } finally {
+    await closeClient();
+  }
+};
+
+interface DbUser extends User {
+  compare: boolean;
+  userPass: string;
+}
+export const getAllUsersFromDB = async (): Promise<DbUser[]> => {
+  try {
+    const db = await getDB();
+
+    const result = await db.collection<User>("users").find({}).toArray();
+
+    const usersWithComparedPassword: DbUser[] = await Promise.all(
+      result.map(async ({ email, password }, index) => {
+        const userPass = mockUsers[index].password;
+        const compare = await isUserPassword(userPass, password);
+        return {
+          email,
+          password,
+          userPass,
+          compare,
+        };
+      })
+    );
+
+    return usersWithComparedPassword;
+  } catch (err) {
+    console.error(`Error getting all users from database:\n${err}`);
+    process.exit(1);
+  } finally {
+    await closeClient();
+  }
+};
+// addMockUsers()
+//   .then(connectToDB)
+//   .then(getAllUsersFromDB)
+//   .then((users) => console.log(users.slice(0, 7)));
