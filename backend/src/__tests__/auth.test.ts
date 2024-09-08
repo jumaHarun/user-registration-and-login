@@ -1,33 +1,22 @@
 import request from "supertest";
 import { Application } from "express";
-import {
-  describe,
-  it,
-  expect,
-  beforeAll,
-  afterEach,
-  afterAll,
-} from "@jest/globals";
-import { createTestApp } from "../utils/testHelpers.ts";
-import { deleteMany, createUser } from "../repos/userRepo.ts";
-import { closeClient } from "../config/database.ts";
+import { describe, it, expect, beforeAll, afterEach } from "@jest/globals";
+import { createTestApp, deleteMany } from "../utils/testHelpers.ts";
+import { createUser } from "../models/users.model.ts";
 
 let app: Application;
 
-describe.skip("POST /api/auth/login", () => {
+describe("POST /api/auth/login", () => {
   beforeAll(async () => {
     // Connect to DB
     app = await createTestApp();
+    // Clean up user collection before any test
     await deleteMany();
   });
 
   afterEach(async () => {
     // Clean up user collection after each test
     await deleteMany();
-  });
-
-  afterAll(async () => {
-    await closeClient();
   });
 
   it("should return an error for missing email", async () => {
@@ -72,7 +61,10 @@ describe.skip("POST /api/auth/login", () => {
   });
 
   it("should return an error for invalid password", async () => {
-    await createUser("testuser@example.com", "password123");
+    await createUser({
+      email: "testuser@example.com",
+      password: "password123",
+    });
 
     const response = await request(app)
       .post("/api/auth/login")
@@ -83,20 +75,17 @@ describe.skip("POST /api/auth/login", () => {
   });
 });
 
-describe.skip("POST /api/auth/register", () => {
+describe("POST /api/auth/register", () => {
   beforeAll(async () => {
     // Connect to DB
     app = await createTestApp();
+    // Clean up user collection before any test
     await deleteMany();
   });
 
   afterEach(async () => {
     // Clean up user collection after each test
     await deleteMany();
-  });
-
-  afterAll(async () => {
-    await closeClient();
   });
 
   it("should register a new user successfully", async () => {
@@ -110,7 +99,10 @@ describe.skip("POST /api/auth/register", () => {
   });
 
   it("should return an error if the email is already registered", async () => {
-    await createUser("testuser@example.com", "password123");
+    await createUser({
+      email: "testuser@example.com",
+      password: "password123",
+    });
 
     const response = await request(app)
       .post("/api/auth/register")

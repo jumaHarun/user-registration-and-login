@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import { config } from "dotenv";
 import jwt from "jsonwebtoken";
-import { createUser, findUserByEmail } from "../repos/userRepo.ts";
+import { createUser, findUserByEmail } from "../models/users.model.ts";
 import { hashPassword, isUserPassword } from "../utils/databaseHelpers.ts";
 
 config({ path: "../.env" });
@@ -34,7 +34,12 @@ export const registerUser = asyncHandler(
 
     const hashedPassword = await hashPassword(password, saltOrRounds);
 
-    const newUser = await createUser(email, hashedPassword);
+    const newUser = await createUser({ email, password: hashedPassword });
+
+    if (!newUser) {
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    }
 
     const token = jwt.sign({ userId: newUser._id }, jwtSecret, {
       expiresIn: "1h",
