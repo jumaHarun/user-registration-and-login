@@ -1,5 +1,7 @@
 import express from "express";
 import { config } from "dotenv";
+import cors from "cors";
+import helmet from "helmet";
 import { errorHandler } from "./middlewares/errorHandler.ts";
 import { connectToDB } from "./config/database.ts";
 import authRoutes from "./routes/authRoutes.ts";
@@ -8,6 +10,9 @@ config({ path: "../.env" });
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors());
+app.use(helmet());
 
 main();
 async function main() {
