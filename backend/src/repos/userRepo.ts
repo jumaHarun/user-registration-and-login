@@ -1,4 +1,4 @@
-import { ObjectId, MongoClient, Db } from "mongodb";
+import { ObjectId } from "mongodb";
 import { config } from "dotenv";
 import { getDB } from "../config/database.ts";
 
@@ -9,7 +9,6 @@ const uri = process.env.MONGO_URI;
 if (!uri) {
   throw new Error("Please provide a MongoDB URL in the .env file");
 }
-const client = new MongoClient(uri);
 const collectionName = "users";
 
 interface User {
@@ -19,13 +18,11 @@ interface User {
 }
 
 export const findUserByEmail = async (email: string) => {
-  const userColl = await getDB();
-  if (!userColl) {
+  const db = await getDB();
+  if (!db) {
     throw new Error("Could not get the database.");
   }
-  const user = await userColl
-    .collection<User>(collectionName)
-    .findOne({ email });
+  const user = await db.collection<User>(collectionName).findOne({ email });
   return user;
 };
 

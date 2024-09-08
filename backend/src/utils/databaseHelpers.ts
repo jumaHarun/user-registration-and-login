@@ -1,11 +1,4 @@
-import { ObjectId } from "mongodb";
 import bcrypt from "bcrypt";
-
-interface User {
-  _id?: ObjectId;
-  email: string;
-  password: string;
-}
 
 // Hash password - return user with hashed password
 type THashPassword = (
