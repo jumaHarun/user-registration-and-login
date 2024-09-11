@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import db from "../utils/database/mongo.conn.ts";
+import db from "../utils/database/mongoConn.ts";
 
 export interface User {
   _id?: ObjectId;
@@ -22,3 +22,5 @@ export const createUser = async (user: User): Promise<User | null> => {
     ...user,
   };
 };
+
+// Find user by refresh token

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import { config } from "dotenv";
 import jwt from "jsonwebtoken";
-import { createUser, findUserByEmail } from "../models/users.model.ts";
+import { createUser, findUserByEmail } from "../models/Users.ts";
 import { hashPassword, isUserPassword } from "../utils/databaseHelpers.ts";
 
 config({ path: "../.env" });

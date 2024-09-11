@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import db from "../utils/database/mongo.conn.ts";
+import db from "./database/mongoConn.ts";
 import authRoutes from "../routes/authRoutes.ts";
 import { errorHandler } from "../middlewares/errorHandler.ts";
 
