@@ -1,5 +1,7 @@
 import { ChangeEvent, FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { registerUser } from "../services/authService";
+import { FormButton, FormInput } from "../components/form/index";
 
 export interface UserData {
   email: string;
@@ -7,15 +9,27 @@ export interface UserData {
   confirmPassword: string;
 }
 
+type UserErrors = {
+  emailError?: string;
+  passwordError?: string;
+  formError?: string;
+};
+
 const Registration = () => {
   const [formData, setFormData] = useState<UserData>({
     email: "",
     password: "",
     confirmPassword: "",
   });
+  const [errors, setErrors] = useState<UserErrors>({
+    emailError: "",
+    passwordError: "",
+    formError: "",
+  });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -25,38 +39,48 @@ const Registration = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    setError(null);
+    setErrors({});
     setSuccessMessage(null);
     setLoading(true);
 
     const { email, password, confirmPassword } = formData;
 
     if (!email || !password || !confirmPassword) {
-      setError("All fields are required!");
+      setErrors({ formError: "All fields are required!" });
+      setLoading(false);
+      return;
+    }
+
+    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+      setErrors({ emailError: "Please enter a valid email" });
       setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Password do not match!");
+      setErrors({ passwordError: "Password do not match!" });
       setLoading(false);
       return;
     }
 
     if (password.length < 8) {
-      setError("Password must be at least 8 characters long!");
+      setErrors({
+        passwordError: "Password must be at least 8 characters long!",
+      });
       setLoading(false);
       return;
     }
 
     if (!/[A-Z]/.test(password)) {
-      setError("Password must contain at least one uppercase letter");
+      setErrors({
+        passwordError: "Password must contain at least one uppercase letter",
+      });
       setLoading(false);
       return;
     }
 
     if (!/[0-9]/.test(password)) {
-      setError("Password must contain at least one number");
+      setErrors({ passwordError: "Password must contain at least one number" });
       setLoading(false);
       return;
     }
@@ -67,43 +91,51 @@ const Registration = () => {
       console.log("User registered", response);
       setSuccessMessage("Regristration successful!");
       setLoading(false);
-    } catch (error) {
+      navigate("/");
+    } catch (err) {
+      const error = err as Error;
+
       console.error("Error registering user", error);
-      setError(error.message || "Registration failed. Try again.");
+      setErrors({
+        formError: error.message || "Registration failed. Try again.",
+      });
       setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h1>User Registration</h1>
-
+    <div className="mainContainer">
+      <div className="titleContainer">
+        <div>User Registration</div>
+      </div>
+      <br />
       <form onSubmit={handleSubmit}>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <input
+        {errors.formError && (
+          <label className="errorLabel">{errors.formError}</label>
+        )}
+
+        <FormInput
           type="email"
-          name="email"
-          placeholder="Email"
-          onChange={handleChange}
+          inputPlaceholder="yourmail@yourcompany.com"
+          inputValue={formData.email}
+          onChangeHandler={(e) => handleChange(e)}
+          inputError={errors.emailError}
         />
-        <input
+        <FormInput
           type="password"
-          name="password"
-          placeholder="Password"
-          onChange={handleChange}
+          inputPlaceholder="*******"
+          inputValue={formData.password}
+          onChangeHandler={(e) => handleChange(e)}
+          inputError={errors.passwordError}
         />
-        <input
-          type="password"
-          name="confirmPassword"
-          placeholder="Confirm Password"
-          onChange={handleChange}
+        <FormInput
+          type="confirmPassword"
+          inputPlaceholder="*******"
+          inputValue={formData.confirmPassword}
+          onChangeHandler={(e) => handleChange(e)}
         />
-        <button
-          type="submit"
-          disabled={loading}
-        >
-          {loading ? "Registering..." : "Register"}
-        </button>
+
+        <FormButton isLoading={loading} />
 
         {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
       </form>
