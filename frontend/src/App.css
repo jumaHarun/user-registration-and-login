@@ -1,17 +1,18 @@
-.mainContainer,
-.titleContainer {
-  display: flex;
+.mainContainer {
   flex-direction: column;
+  display: flex;
   align-items: center;
   justify-content: center;
-}
-.mainContainer {
   height: 100vh;
 }
 
 .titleContainer {
+  display: flex;
+  flex-direction: column;
   font-size: 64px;
   font-weight: bolder;
+  align-items: center;
+  justify-content: center;
 }
 
 .resultContainer,
@@ -47,7 +48,7 @@
   justify-content: center;
 }
 
-.inputContainer > .errorLabel {
+.errorLabel {
   color: red;
   font-size: 12px;
 }
