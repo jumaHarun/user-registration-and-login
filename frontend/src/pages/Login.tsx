@@ -1,85 +1,93 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  FormEvent,
+  SetStateAction,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
+import { FormButton, FormInput } from "../components/form/index";
+import { loginUser } from "../services/authService";
 
-interface LoginProps {
+type LoginProps = {
   setLoggedIn: Dispatch<SetStateAction<boolean>>;
   setEmail: Dispatch<SetStateAction<string>>;
-}
+};
 
 const Login = ({ setEmail, setLoggedIn }: LoginProps) => {
-  const [emailInp, setEmailInp] = useState("");
-  const [passwordInp, setPasswordInp] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>("");
+  const [errorMessage, setErrorMessage] = useState<string | null>("");
 
   const navigate = useNavigate();
 
-  const onClickHandler = () => {
-    // Set initial empty error values
-    setEmailError("");
-    setPasswordError("");
-
-    // Check if user has entered required fields correctly
-    if (emailInp === "") {
-      setEmailError("Please enter your email!");
-      return;
-    }
-
-    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(emailInp)) {
-      setEmailError("Please enter a valid email");
-      return;
-    }
-
-    if ("" === passwordInp) {
-      setPasswordError("Please enter a password");
-      return;
-    }
-
-    if (passwordInp.length < 7) {
-      setPasswordError("The password must be 8 characters or longer");
-      return;
-    }
-
-    // Authentication calls will be made here...
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    setLoading(true);
+
+    const { email, password } = formData;
+    if (!email || !password) {
+      setErrorMessage("All fields are required!");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await loginUser({ email, password });
+      console.log("Login successful!", response);
+      setSuccessMessage("Login successful!");
+      setEmail(email);
+      setLoggedIn(true);
+      setLoading(false);
+      navigate("/");
+    } catch (err) {
+      const error = err as Error;
+
+      console.error("Error logging in!", error);
+      setErrorMessage(error.message || "Login failed. Try again.");
+      setLoading(false);
+    }
+  };
   return (
     <div className="mainContainer">
       <div className="titleContainer">
         <div>Login</div>
       </div>
       <br />
-      <div className="inputContainer">
-        <input
-          type="email"
-          className="inputBox"
-          placeholder="exampleuser@mail.com"
-          value={emailInp}
-          onChange={(e) => setEmailInp(e.target.value)}
-        />
-        <label className="errorLabel">{emailError}</label>
-      </div>
-      <br />
 
-      <div className="inputContainer">
-        <input
+      <form onSubmit={handleSubmit}>
+        <label className="errorLabel">{errorMessage}</label>
+
+        <FormInput
+          type="email"
+          inputPlaceholder="yourmail@yourcompany.com"
+          inputValue={formData.email}
+          onChangeHandler={handleChange}
+        />
+
+        <FormInput
           type="password"
-          className="inputBox"
-          placeholder="********"
-          value={passwordInp}
-          onChange={(e) => setPasswordInp(e.target.value)}
+          inputPlaceholder="*******"
+          inputValue={formData.password}
+          onChangeHandler={handleChange}
         />
-        <label className="errorLabel">{passwordError}</label>
-      </div>
-      <br />
-      <div className="inputContainer">
-        <input
-          type="button"
-          className="inputButton"
-          value={"Log in"}
-          onClick={onClickHandler}
-        />
-      </div>
+
+        <FormButton isLoading={loading} />
+
+        {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
+      </form>
     </div>
   );
 };
