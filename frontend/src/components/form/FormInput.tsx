@@ -1,12 +1,4 @@
-import { ChangeEventHandler } from "react";
-
-type InputProps = {
-  type: "email" | "password" | "confirmPassword";
-  inputPlaceholder: "yourmail@yourcompany.com" | "*******";
-  inputValue: string;
-  onChangeHandler: ChangeEventHandler<HTMLInputElement>;
-  inputError?: string;
-};
+import { InputProps } from "../../types/components";
 
 const FormInput = ({
   type,
