@@ -1,13 +1,19 @@
+import {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
+} from "../types/auth";
 import API from "./axios";
 
-type UserData = {
-  email: string;
-  password: string;
-};
-
-export const registerUser = async (userData: UserData) => {
+export const registerUser = async (
+  userData: RegisterRequest
+): Promise<RegisterResponse> => {
   try {
-    const response = await API.post("/auth/register", userData);
+    const response = await API.post<RegisterResponse>(
+      "/auth/register",
+      userData
+    );
     return response.data;
   } catch (err) {
     if (err.response && err.response.data) {
@@ -17,9 +23,11 @@ export const registerUser = async (userData: UserData) => {
   }
 };
 
-export const loginUser = async (userData: UserData) => {
+export const loginUser = async (
+  userData: LoginRequest
+): Promise<LoginResponse> => {
   try {
-    const response = await API.post("/auth/login", userData);
+    const response = await API.post<LoginResponse>("/auth/login", userData);
     return response.data;
   } catch (err) {
     if (err.response && err.response.data) {
