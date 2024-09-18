@@ -4,7 +4,6 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import "./App.css";
 import Registration from "./pages/Registration";
-import Header from "./components/Header";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -12,7 +11,6 @@ function App() {
 
   return (
     <div className="App">
-      <Header />
       <Router>
         <Routes>
           <Route
