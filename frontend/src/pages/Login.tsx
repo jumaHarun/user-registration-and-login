@@ -1,18 +1,12 @@
-import {
-  ChangeEvent,
-  Dispatch,
-  FormEvent,
-  SetStateAction,
-  useState,
-} from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FormButton, FormInput } from "../components/form/index";
+import {
+  HandleChangeHandler,
+  HandleSubmitHandler,
+  LoginProps,
+} from "../types/pages";
+import { FormButton, FormInput } from "../components/form";
 import { loginUser } from "../services/authService";
-
-type LoginProps = {
-  setLoggedIn: Dispatch<SetStateAction<boolean>>;
-  setEmail: Dispatch<SetStateAction<string>>;
-};
 
 const Login = ({ setEmail, setLoggedIn }: LoginProps) => {
   const [formData, setFormData] = useState({
@@ -25,12 +19,12 @@ const Login = ({ setEmail, setLoggedIn }: LoginProps) => {
 
   const navigate = useNavigate();
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange: HandleChangeHandler = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit: HandleSubmitHandler = async (e) => {
     e.preventDefault();
 
     setErrorMessage(null);

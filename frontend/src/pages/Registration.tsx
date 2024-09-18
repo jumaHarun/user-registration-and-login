@@ -1,27 +1,21 @@
-import { ChangeEvent, FormEvent, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../services/authService";
+import {
+  RegistrationUserData,
+  UserFormErrors,
+  HandleChangeHandler,
+  HandleSubmitHandler,
+} from "../types/pages";
 import { FormButton, FormInput } from "../components/form/index";
 
-export interface UserData {
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
-
-type UserErrors = {
-  emailError?: string;
-  passwordError?: string;
-  formError?: string;
-};
-
 const Registration = () => {
-  const [formData, setFormData] = useState<UserData>({
+  const [formData, setFormData] = useState<RegistrationUserData>({
     email: "",
     password: "",
     confirmPassword: "",
   });
-  const [errors, setErrors] = useState<UserErrors>({
+  const [errors, setErrors] = useState<UserFormErrors>({
     emailError: "",
     passwordError: "",
     formError: "",
@@ -31,12 +25,12 @@ const Registration = () => {
 
   const navigate = useNavigate();
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange: HandleChangeHandler = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit: HandleSubmitHandler = async (e) => {
     e.preventDefault();
 
     setErrors({});

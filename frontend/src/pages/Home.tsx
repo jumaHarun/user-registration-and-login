@@ -1,11 +1,5 @@
-import { Dispatch, SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
-
-interface HomeProps {
-  loggedIn: boolean;
-  email: string;
-  setLoggedIn: Dispatch<SetStateAction<boolean>>;
-}
+import { HomeProps } from "../types/pages";
 
 const Home = ({ loggedIn, email, setLoggedIn }: HomeProps) => {
   const navigate = useNavigate();
