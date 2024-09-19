@@ -4,6 +4,10 @@ import { config } from "dotenv";
 import jwt from "jsonwebtoken";
 import { createUser, findUserByEmail } from "../models/Users.ts";
 import { hashPassword, isUserPassword } from "../utils/databaseHelpers.ts";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../utils/authHepers.ts";
 
 config({ path: "../.env" });
 
@@ -41,15 +45,9 @@ export const registerUser = asyncHandler(
       return;
     }
 
-    const token = jwt.sign({ userId: newUser._id }, jwtSecret, {
-      expiresIn: "1h",
-    });
-
-    res.status(201).json({
-      message: `User registered successfully`,
-      user: newUser,
-      token,
-    });
+    res
+      .status(201)
+      .json({ message: `User registered successfully`, user: newUser });
   }
 );
 
@@ -58,7 +56,8 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   if (!email) {
     res.status(400).json({ message: "Please provide an email address" });
     return;
-  } else if (!password) {
+  }
+  if (!password) {
     res.status(400).json({ message: "Please provide a password" });
     return;
   }
@@ -75,9 +74,39 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
     return;
   }
 
-  const token = jwt.sign({ userId: user._id }, jwtSecret, {
-    expiresIn: "1h",
-  });
+  const accesToken = generateAccessToken(user._id);
+  const refreshToken = generateRefreshToken(user._id);
 
-  res.status(200).json({ message: "Login successful", token });
+  res
+    .status(200)
+    .cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "strict",
+    })
+    .header("Authorization", `Bearer ${accesToken}`)
+    .json({ message: "Login successful", accesToken, refreshToken });
+});
+
+export const refresh = asyncHandler(async (req: Request, res: Response) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) {
+    res
+      .status(401)
+      .json({ message: "Access Denied. No refresh token provided" });
+    return;
+  }
+
+  const decoded = <jwt.UserIdJwtPayload>jwt.verify(refreshToken, jwtSecret);
+
+  const accesToken = generateAccessToken(decoded.userId);
+  const newRefreshToken = generateRefreshToken(decoded.userId);
+
+  res
+    .status(200)
+    .cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      sameSite: "strict",
+    })
+    .header("Authorization", `Bearer ${accesToken}`)
+    .json({ accesToken, refreshToken: newRefreshToken });
 });
