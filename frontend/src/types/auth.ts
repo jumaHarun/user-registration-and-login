@@ -18,3 +18,12 @@ export type LoginResponse = {
   accesToken: string;
   refreshToken: string;
 };
+
+export type RefreshRequest = {
+  refreshToken: string;
+};
+
+export type RefreshResponse = {
+  accesToken: string;
+  refreshToken: string;
+};
