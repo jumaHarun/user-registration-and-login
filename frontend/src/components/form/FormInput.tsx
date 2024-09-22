@@ -1,4 +1,4 @@
-import { InputProps } from "../../types/components";
+import { InputProps } from "../../types";
 
 const FormInput = ({
   type,

@@ -6,7 +6,7 @@ import {
   UserFormErrors,
   HandleChangeHandler,
   HandleSubmitHandler,
-} from "../types/pages";
+} from "../types";
 import { FormButton, FormInput } from "../components/form/index";
 
 const Registration = () => {

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { HomeProps } from "../types/pages";
+import { HomeProps } from "../types";
 
 const Home = ({ loggedIn, email, setLoggedIn }: HomeProps) => {
   const navigate = useNavigate();

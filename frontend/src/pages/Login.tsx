@@ -4,7 +4,7 @@ import {
   HandleChangeHandler,
   HandleSubmitHandler,
   LoginProps,
-} from "../types/pages";
+} from "../types";
 import { FormButton, FormInput } from "../components/form";
 import { loginUser } from "../services/authService";
 

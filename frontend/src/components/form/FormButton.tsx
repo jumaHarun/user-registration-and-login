@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import { ButtonProps } from "../../types/components";
+import { ButtonProps } from "../../types";
 
 const FormButton = ({ isLoading }: ButtonProps) => {
   let buttonText;

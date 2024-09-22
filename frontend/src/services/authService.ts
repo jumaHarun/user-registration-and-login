@@ -3,7 +3,7 @@ import {
   LoginResponse,
   RegisterRequest,
   RegisterResponse,
-} from "../types/auth";
+} from "../types";
 import API from "./axios";
 
 export const registerUser = async (
