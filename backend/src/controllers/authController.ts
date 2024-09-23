@@ -74,7 +74,8 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
     return;
   }
 
-  const accesToken = generateAccessToken(user._id);
+  // Generate and save tokens to local storage
+  const accessToken = generateAccessToken(user._id);
   const refreshToken = generateRefreshToken(user._id);
 
   res
@@ -98,7 +99,7 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
 
   const decoded = <jwt.UserIdJwtPayload>jwt.verify(refreshToken, jwtSecret);
 
-  const accesToken = generateAccessToken(decoded.userId);
+  const accessToken = generateAccessToken(decoded.userId);
   const newRefreshToken = generateRefreshToken(decoded.userId);
 
   res
