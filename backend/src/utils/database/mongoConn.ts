@@ -1,7 +1,7 @@
 import { Db, MongoClient } from "mongodb";
 import { config } from "dotenv";
 
-config({ path: "../.env" });
+config();
 
 const uri = process.env.MONGO_URI || "";
 const dbName = process.env.MONGO_DB || "";

@@ -9,7 +9,7 @@ import {
   generateRefreshToken,
 } from "../utils/authHepers.ts";
 
-config({ path: "../.env" });
+config();
 
 const jwtSecret = process.env.JWT_SECRET_KEY;
 if (!jwtSecret) {

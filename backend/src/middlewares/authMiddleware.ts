@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { config } from "dotenv";
 
-config({ path: "../.env" });
+config();
 
 const jwtSecret = process.env.JWT_SECRET_KEY;
 if (!jwtSecret) {

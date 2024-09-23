@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { config } from "dotenv";
 import jwt from "jsonwebtoken";
 
-config({ path: "../.env" });
+config();
 
 const jwtSecret = process.env.JWT_SECRET_KEY;
 if (!jwtSecret) {

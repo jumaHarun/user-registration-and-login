@@ -5,7 +5,7 @@ import helmet from "helmet";
 import { errorHandler } from "./middlewares/errorHandler.ts";
 import authRoutes from "./routes/authRoutes.ts";
 
-config({ path: "../.env" });
+config();
 
 const app = express();
 app.use(express.json());
