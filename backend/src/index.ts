@@ -12,6 +12,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(helmet());
+// TODO: Install cookie parser
+// app.use(cookieParser());
 
 app.get("/", (req, res) => {
   res.send(
@@ -27,3 +29,11 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+app.use(
+  cors({
+    origin: `http://localhost:${port}`,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);

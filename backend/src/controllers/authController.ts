@@ -19,7 +19,7 @@ if (!jwtSecret) {
 const saltOrRounds = 10;
 
 export const registerUser = asyncHandler(
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response, next) => {
     const { email, password } = req.body;
 
     if (!email) {
@@ -45,69 +45,114 @@ export const registerUser = asyncHandler(
       return;
     }
 
+    const accessToken = generateAccessToken(newUser._id);
+    const refreshToken = generateRefreshToken(newUser._id);
+
     res
       .status(201)
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        path: "/",
+        domain: "localhost",
+        secure: false,
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
+      .header("Authorization", `Bearer ${accessToken}`)
       .json({ message: `User registered successfully`, user: newUser });
+
+    // For Production
+    // res
+    // .status(201)
+    // .cookie("refreshToken", refreshToken, {
+    //   httpOnly: true,
+    //   path: "/",
+    //   domain: "localhost",
+    //   secure: true,
+    //   sameSite: "none",
+    //   maxAge: 7 * 24 * 60 * 60 * 1000,
+    // })
+    // .header("Authorization", `Bearer ${accessToken}`)
+    // .json({ message: `User registered successfully`, user: newUser });
+
+    next();
   }
 );
 
-export const loginUser = asyncHandler(async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  if (!email) {
-    res.status(400).json({ message: "Please provide an email address" });
-    return;
-  }
-  if (!password) {
-    res.status(400).json({ message: "Please provide a password" });
-    return;
-  }
+export const loginUser = asyncHandler(
+  async (req: Request, res: Response, next) => {
+    const { email, password } = req.body;
+    if (!email) {
+      res.status(400).json({ message: "Please provide an email address" });
+      return;
+    }
+    if (!password) {
+      res.status(400).json({ message: "Please provide a password" });
+      return;
+    }
 
-  const user = await findUserByEmail(email);
-  if (!user) {
-    res.status(400).json({ message: "Invalid email" });
-    return;
-  }
+    const user = await findUserByEmail(email);
+    if (!user) {
+      res.status(400).json({ message: "Invalid email" });
+      return;
+    }
 
-  const isMatch = await isUserPassword(password, user.password);
-  if (!isMatch) {
-    res.status(401).json({ message: "Invalid password" });
-    return;
-  }
+    const isMatch = await isUserPassword(password, user.password);
+    if (!isMatch) {
+      res.status(401).json({ message: "Invalid password" });
+      return;
+    }
 
-  // Generate and save tokens to local storage
-  const accessToken = generateAccessToken(user._id);
-  const refreshToken = generateRefreshToken(user._id);
+    // Generate and save tokens to local storage
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
 
-  res
-    .status(200)
-    .cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      sameSite: "strict",
-    })
-    .header("Authorization", `Bearer ${accesToken}`)
-    .json({ message: "Login successful", accesToken, refreshToken });
-});
-
-export const refresh = asyncHandler(async (req: Request, res: Response) => {
-  const { refreshToken } = req.body;
-  if (!refreshToken) {
     res
-      .status(401)
-      .json({ message: "Access Denied. No refresh token provided" });
-    return;
+      .status(200)
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        path: "/",
+        domain: "localhost",
+        secure: false,
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
+      .header("Authorization", `Bearer ${accessToken}`)
+      .json({
+        message: "Login successful",
+        accessToken: accessToken,
+        refreshToken,
+      });
+    next();
   }
+);
 
-  const decoded = <jwt.UserIdJwtPayload>jwt.verify(refreshToken, jwtSecret);
+export const refresh = asyncHandler(
+  async (req: Request, res: Response, next) => {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      res
+        .status(401)
+        .json({ message: "Access Denied. No refresh token provided" });
+      return;
+    }
 
-  const accessToken = generateAccessToken(decoded.userId);
-  const newRefreshToken = generateRefreshToken(decoded.userId);
+    const decoded = <jwt.UserIdJwtPayload>jwt.verify(refreshToken, jwtSecret);
 
-  res
-    .status(200)
-    .cookie("refreshToken", newRefreshToken, {
-      httpOnly: true,
-      sameSite: "strict",
-    })
-    .header("Authorization", `Bearer ${accesToken}`)
-    .json({ accesToken, refreshToken: newRefreshToken });
-});
+    const accessToken = generateAccessToken(decoded.userId);
+    const newRefreshToken = generateRefreshToken(decoded.userId);
+
+    res
+      .status(200)
+      .cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
+        path: "/",
+        domain: "localhost",
+        secure: false,
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
+      .header("Authorization", `Bearer ${accessToken}`)
+      .json({ accessToken: accessToken, refreshToken: newRefreshToken });
+  }
+);
