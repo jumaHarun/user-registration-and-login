@@ -28,8 +28,8 @@ export const loginUser = async (
     const response = await API.post<LoginResponse>("/auth/login", userData);
 
     // Manage Tokens
-    const { accesToken, refreshToken } = response.data;
-    localStorage.setItem("accesToken", accesToken);
+    const { accessToken, refreshToken } = response.data;
+    localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("refreshToken", refreshToken);
 
     return response.data;

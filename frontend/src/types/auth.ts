@@ -15,7 +15,7 @@ export type LoginRequest = {
 
 export type LoginResponse = {
   message: string;
-  accesToken: string;
+  accessToken: string;
   refreshToken: string;
 };
 
@@ -24,6 +24,6 @@ export type RefreshRequest = {
 };
 
 export type RefreshResponse = {
-  accesToken: string;
+  accessToken: string;
   refreshToken: string;
 };
